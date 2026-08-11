@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://tower_switch_scene"]
+
+[ext_resource type="Script" path="res://src/scripts/tower_switch.gd" id="1_switch_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_switch"]
+size = Vector3(0.6, 1.2, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_switch"]
+size = Vector3(0.6, 1.2, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_switch"]
+albedo_color = Color(0.15, 0.15, 0.18, 1)
+roughness = 0.6
+
+[node name="TowerSwitch" type="Area3D"]
+script = ExtResource("1_switch_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("BoxShape3D_switch")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("BoxMesh_switch")
+surface_material_override/0 = SubResource("StandardMaterial3D_switch")
+
+[node name="SwitchLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0.25)
+light_color = Color(0.85, 0.17, 0.17, 1)
+light_energy = 1.0
+omni_range = 3.0

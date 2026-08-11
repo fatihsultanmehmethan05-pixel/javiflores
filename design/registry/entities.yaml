@@ -1,0 +1,249 @@
+# Game World Entity Registry — Signal Array 04
+# Single source of truth for game-world facts across all GDDs.
+
+version: 1
+last_updated: "2026-08-11"
+
+# ─── ENTITIES ────────────────────────────────────────────────────────────────
+
+entities:
+  - name: player
+    status: active
+    source: design/gdd/player-controller-fps.md
+    referenced_by:
+      - design/gdd/player-controller-fps.md
+      - design/gdd/multiplayer-netcode-system.md
+      - design/gdd/flashlight-power-system.md
+      - design/gdd/forest-antennae-system.md
+      - design/gdd/anomaly-entity-ai.md
+      - design/gdd/diegetic-ui-system.md
+    health: 100.0
+    walk_speed: 3.5
+    sprint_speed: 5.5
+    crouch_speed: 1.8
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+  - name: anomaly_threat
+    status: active
+    source: design/gdd/anomaly-entity-ai.md
+    referenced_by:
+      - design/gdd/anomaly-entity-ai.md
+      - design/gdd/radio-communication-system.md
+      - design/gdd/diegetic-ui-system.md
+    move_speed: 2.4
+    detection_radius: 9.0
+    damage_per_second: 12.0
+    patrol_radius: 18.0
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+  - name: antenna_panel
+    status: active
+    source: design/gdd/forest-antennae-system.md
+    referenced_by:
+      - design/gdd/forest-antennae-system.md
+      - design/gdd/tower-terminal-system.md
+      - design/gdd/diegetic-ui-system.md
+    repair_duration: 1.5
+    requires_fuse: true
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+  - name: sector_floodlight
+    status: active
+    source: design/gdd/tower-terminal-system.md
+    referenced_by:
+      - design/gdd/tower-terminal-system.md
+      - design/gdd/multiplayer-netcode-system.md
+    active_duration: 12.0
+    cooldown_duration: 10.0
+    light_energy: 45.0
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+# ─── ITEMS ───────────────────────────────────────────────────────────────────
+
+items:
+  - name: fuse_pickup
+    status: active
+    source: design/gdd/forest-antennae-system.md
+    referenced_by:
+      - design/gdd/forest-antennae-system.md
+      - design/gdd/player-controller-fps.md
+      - design/gdd/game-concept.md
+    category: repair_tool
+    stackable: false
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+  - name: high_capacity_battery
+    status: planned
+    source: design/gdd/save-progression-system.md
+    referenced_by:
+      - design/gdd/save-progression-system.md
+      - design/gdd/flashlight-power-system.md
+    value_credits: 75
+    category: tool_upgrade
+    capacity_units: 200.0
+    added: 2026-08-11
+    revised: ""
+
+  - name: flare_gun
+    status: planned
+    source: design/gdd/save-progression-system.md
+    referenced_by:
+      - design/gdd/save-progression-system.md
+      - design/gdd/anomaly-entity-ai.md
+    value_credits: 180
+    category: consumable
+    stun_duration: 6.0
+    added: 2026-08-11
+    revised: ""
+
+# ─── FORMULAS ────────────────────────────────────────────────────────────────
+
+formulas:
+  - name: battery_depletion_formula
+    status: active
+    source: design/gdd/flashlight-power-system.md
+    referenced_by:
+      - design/gdd/flashlight-power-system.md
+      - design/gdd/save-progression-system.md
+    variables:
+      - B_prev
+      - r_drain
+      - delta
+    output_range: [0.0, 100.0]
+    expression: "max(B_prev - r_drain * delta, 0.0)"
+    added: 2026-08-11
+    revised: ""
+
+  - name: antenna_repair_formula
+    status: target
+    source: design/gdd/forest-antennae-system.md
+    referenced_by:
+      - design/gdd/forest-antennae-system.md
+      - design/gdd/player-controller-fps.md
+    variables:
+      - P_prev
+      - delta
+      - has_fuse
+      - is_crouching
+    output_range: [0.0, 1.5]
+    expression: "min(P_prev + delta, 1.5) if has_fuse and not is_crouching else max(P_prev - 2.0 * delta, 0.0)"
+    added: 2026-08-11
+    revised: ""
+
+  - name: frequency_match_formula
+    status: active
+    source: design/gdd/tower-terminal-system.md
+    referenced_by:
+      - design/gdd/tower-terminal-system.md
+      - design/gdd/save-progression-system.md
+    variables:
+      - M_prev
+      - delta
+      - freq_diff
+      - tolerance
+    output_range: [0.0, 100.0]
+    expression: "min(M_prev + 60.0 * delta, 100.0) if freq_diff <= tolerance else max(M_prev - 30.0 * delta, 0.0)"
+    added: 2026-08-11
+    revised: ""
+
+  - name: stealth_detection_formula
+    status: active
+    source: design/gdd/anomaly-entity-ai.md
+    referenced_by:
+      - design/gdd/anomaly-entity-ai.md
+      - design/gdd/player-controller-fps.md
+      - design/gdd/flashlight-power-system.md
+      - design/gdd/diegetic-ui-system.md
+    variables:
+      - is_crouching
+      - is_flashlight_on
+    expression: "is_crouching and not is_flashlight_on"
+    added: 2026-08-11
+    revised: ""
+
+# ─── CONSTANTS ───────────────────────────────────────────────────────────────
+
+constants:
+  - name: walk_speed
+    status: active
+    source: design/gdd/player-controller-fps.md
+    referenced_by:
+      - design/gdd/player-controller-fps.md
+      - design/gdd/game-concept.md
+    value: 3.5
+    unit: m/s
+    added: 2026-08-10
+    revised: ""
+
+  - name: sprint_speed
+    status: active
+    source: design/gdd/player-controller-fps.md
+    referenced_by:
+      - design/gdd/player-controller-fps.md
+      - design/gdd/game-concept.md
+    value: 5.5
+    unit: m/s
+    added: 2026-08-10
+    revised: ""
+
+  - name: crouch_speed
+    status: active
+    source: design/gdd/player-controller-fps.md
+    referenced_by:
+      - design/gdd/player-controller-fps.md
+      - design/gdd/game-concept.md
+    value: 1.8
+    unit: m/s
+    added: 2026-08-10
+    revised: ""
+
+  - name: interact_distance
+    status: active
+    source: design/gdd/player-controller-fps.md
+    referenced_by:
+      - design/gdd/player-controller-fps.md
+      - design/gdd/forest-antennae-system.md
+    value: 3.5
+    unit: meters
+    added: 2026-08-10
+    revised: "2026-08-11"
+
+  - name: max_battery
+    status: active
+    source: design/gdd/flashlight-power-system.md
+    referenced_by:
+      - design/gdd/flashlight-power-system.md
+      - design/gdd/save-progression-system.md
+      - design/gdd/diegetic-ui-system.md
+    value: 100.0
+    unit: units
+    added: 2026-08-11
+    revised: ""
+
+  - name: floodlight_cooldown
+    status: active
+    source: design/gdd/tower-terminal-system.md
+    referenced_by:
+      - design/gdd/tower-terminal-system.md
+      - design/gdd/multiplayer-netcode-system.md
+    value: 10.0
+    unit: seconds
+    added: 2026-08-11
+    revised: ""
+
+  - name: damaged_antenna_count
+    status: active
+    source: design/gdd/forest-antennae-system.md
+    referenced_by:
+      - design/gdd/forest-antennae-system.md
+      - design/gdd/tower-terminal-system.md
+      - design/gdd/diegetic-ui-system.md
+    value: 3
+    unit: panels
+    added: 2026-08-11
+    revised: ""

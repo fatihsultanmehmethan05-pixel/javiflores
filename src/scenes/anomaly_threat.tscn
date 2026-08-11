@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3 uid="uid://anomaly_threat_scene"]
+
+[ext_resource type="Script" path="res://src/scripts/anomaly_threat.gd" id="1_threat_script"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_threat"]
+radius = 1.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_threat"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_threat"]
+albedo_color = Color(0.1, 0.05, 0.2, 1)
+roughness = 0.5
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_threat"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:is_chasing")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:is_suspicious")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[node name="AnomalyThreat" type="Area3D" groups=["threats"]]
+script = ExtResource("1_threat_script")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.05
+replication_config = SubResource("SceneReplicationConfig_threat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("SphereShape3D_threat")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("SphereMesh_threat")
+surface_material_override/0 = SubResource("StandardMaterial3D_threat")
+
+[node name="IndicatorLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+light_color = Color(0.29, 0, 0.88, 1)
+light_energy = 1.5
+omni_range = 5.0

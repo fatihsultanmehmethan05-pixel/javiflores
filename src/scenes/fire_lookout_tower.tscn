@@ -1,0 +1,145 @@
+[gd_scene load_steps=12 format=3 uid="uid://fire_lookout_tower_scene"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.28, 0.18, 0.1, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.15, 0.18, 0.22, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cabin"]
+albedo_color = Color(0.22, 0.25, 0.28, 1)
+roughness = 0.7
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pillar"]
+size = Vector3(0.5, 10.0, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pillar"]
+size = Vector3(0.5, 10.0, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_deck"]
+size = Vector3(6.0, 0.4, 6.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+size = Vector3(6.0, 0.4, 6.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_roof"]
+size = Vector3(6.6, 0.3, 6.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof"]
+size = Vector3(6.6, 0.3, 6.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_short"]
+size = Vector3(6.0, 1.1, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_short"]
+size = Vector3(6.0, 1.1, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ramp"]
+size = Vector3(2.4, 0.3, 17.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ramp"]
+size = Vector3(2.4, 0.3, 17.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_railing"]
+size = Vector3(0.1, 0.8, 17.0)
+
+[node name="FireLookoutTower" type="Node3D"]
+
+[node name="Pillars" type="Node3D" parent="."]
+
+[node name="PillarNW" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 5, -2.6)
+
+[node name="Collision" type="CollisionShape3D" parent="Pillars/PillarNW"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/PillarNW"]
+mesh = SubResource("BoxMesh_pillar")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="PillarNE" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 5, -2.6)
+
+[node name="Collision" type="CollisionShape3D" parent="Pillars/PillarNE"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/PillarNE"]
+mesh = SubResource("BoxMesh_pillar")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="PillarSW" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 5, 2.6)
+
+[node name="Collision" type="CollisionShape3D" parent="Pillars/PillarSW"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/PillarSW"]
+mesh = SubResource("BoxMesh_pillar")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="PillarSE" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 5, 2.6)
+
+[node name="Collision" type="CollisionShape3D" parent="Pillars/PillarSE"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/PillarSE"]
+mesh = SubResource("BoxMesh_pillar")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="TopDeck" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TopDeck"]
+shape = SubResource("BoxShape3D_deck")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TopDeck"]
+mesh = SubResource("BoxMesh_deck")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="CabinRoof" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinRoof"]
+shape = SubResource("BoxShape3D_roof")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CabinRoof"]
+mesh = SubResource("BoxMesh_roof")
+surface_material_override/0 = SubResource("StandardMaterial3D_cabin")
+
+[node name="CabinBalconyRailings" type="Node3D" parent="."]
+
+[node name="RailingNorth" type="StaticBody3D" parent="CabinBalconyRailings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.75, -2.9)
+
+[node name="Collision" type="CollisionShape3D" parent="CabinBalconyRailings/RailingNorth"]
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="Mesh" type="MeshInstance3D" parent="CabinBalconyRailings/RailingNorth"]
+mesh = SubResource("BoxMesh_wall_short")
+surface_material_override/0 = SubResource("StandardMaterial3D_metal")
+
+[node name="RailingEast" type="StaticBody3D" parent="CabinBalconyRailings"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 2.9, 10.75, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="CabinBalconyRailings/RailingEast"]
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="Mesh" type="MeshInstance3D" parent="CabinBalconyRailings/RailingEast"]
+mesh = SubResource("BoxMesh_wall_short")
+surface_material_override/0 = SubResource("StandardMaterial3D_metal")
+
+[node name="RailingWest" type="StaticBody3D" parent="CabinBalconyRailings"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2.9, 10.75, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="CabinBalconyRailings/RailingWest"]
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="Mesh" type="MeshInstance3D" parent="CabinBalconyRailings/RailingWest"]
+mesh = SubResource("BoxMesh_wall_short")
+surface_material_override/0 = SubResource("StandardMaterial3D_metal")
+
+

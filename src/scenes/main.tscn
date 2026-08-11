@@ -1,0 +1,309 @@
+[gd_scene format=3 uid="uid://c65hts8rirlud"]
+
+[ext_resource type="Script" uid="uid://qk7ijxljfo1l" path="res://src/scripts/main_game.gd" id="1_main_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/hud.tscn" id="3_hud_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/antenna_panel.tscn" id="4_antenna_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/anomaly_threat.tscn" id="5_threat_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/tower_switch.tscn" id="6_switch_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/tree.tscn" id="7_tree_scene"]
+[ext_resource type="Script" uid="uid://bh88yrog1y2qg" path="res://src/scripts/forest_antenna_manager.gd" id="8_manager_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/tower_radar.tscn" id="9_radar_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/signal_decoder.tscn" id="10_decoder_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/fuse_pickup.tscn" id="11_fuse_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/sector_floodlight.tscn" id="12_floodlight_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/tower_console.tscn" id="13_console_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/lobby_ui.tscn" id="14_lobby_scene"]
+[ext_resource type="Script" uid="uid://bdru6v141c42t" path="res://src/scripts/fuse_spawner.gd" id="15_spawner_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/fire_lookout_tower.tscn" id="16_tower_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/tower_ramp.tscn" id="17_ramp_scene"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
+sky_top_color = Color(0.01, 0.01, 0.03, 1)
+sky_horizon_color = Color(0.02, 0.03, 0.05, 1)
+ground_bottom_color = Color(0.005, 0.005, 0.01, 1)
+ground_horizon_color = Color(0.02, 0.03, 0.05, 1)
+
+[sub_resource type="Sky" id="Sky_night"]
+sky_material = SubResource("ProceduralSkyMaterial_night")
+
+[sub_resource type="Environment" id="Environment_night"]
+background_mode = 2
+sky = SubResource("Sky_night")
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.6
+fog_enabled = true
+fog_light_color = Color(0.02, 0.03, 0.05, 1)
+fog_density = 0.05
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.08
+volumetric_fog_albedo = Color(0.03, 0.04, 0.06, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(300, 1, 300)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(300, 1, 300)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.03, 0.05, 0.03, 1)
+roughness = 0.95
+
+[node name="Main" type="Node3D" unique_id=1609122528]
+script = ExtResource("1_main_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1913685749]
+environment = SubResource("Environment_night")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=558337293]
+transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
+light_color = Color(0.2, 0.3, 0.45, 1)
+light_energy = 0.04
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=347836360]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=765444121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=279556786]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("BoxMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="PlayersContainer" type="Node3D" parent="." unique_id=746017894]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=542491824]
+_spawnable_scenes = PackedStringArray("res://src/scenes/player.tscn")
+spawn_path = NodePath("../PlayersContainer")
+
+[node name="LobbyUI" parent="." unique_id=1240234251 instance=ExtResource("14_lobby_scene")]
+
+[node name="HUD" parent="." unique_id=445527755 instance=ExtResource("3_hud_scene")]
+
+[node name="SignalDecoder" parent="." unique_id=1200737071 instance=ExtResource("10_decoder_scene")]
+
+[node name="FireLookoutTower" parent="." unique_id=1539625116 instance=ExtResource("16_tower_scene")]
+
+[node name="TowerWalkwayRamp" parent="." unique_id=507366271 instance=ExtResource("17_ramp_scene")]
+transform = Transform3D(1, 0, 0, 0, 1.0200385, -0.7865291, 0, 0.7274796, 1.102835, 0.23171854, 3.4010744, 12.248167)
+
+[node name="TowerBeaconLight" type="OmniLight3D" parent="." unique_id=361221883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+light_color = Color(0, 1, 0.4, 1)
+light_energy = 4.0
+omni_range = 90.0
+
+[node name="TowerSwitch" parent="." unique_id=885557150 instance=ExtResource("6_switch_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="TowerRadar" parent="." unique_id=1011547315 instance=ExtResource("9_radar_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 3.8)
+
+[node name="TowerConsole" parent="." unique_id=199320685 instance=ExtResource("13_console_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 3.8)
+
+[node name="TowerSpotlight" type="SpotLight3D" parent="." unique_id=1765793784]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 14, 0)
+visible = false
+light_color = Color(0, 1, 0.4, 1)
+light_energy = 5.0
+spot_range = 80.0
+
+[node name="SectorFloodlights" type="Node3D" parent="." unique_id=340985846]
+
+[node name="FloodlightNorth" parent="SectorFloodlights" unique_id=343102570 instance=ExtResource("12_floodlight_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="FloodlightEast" parent="SectorFloodlights" unique_id=786689340 instance=ExtResource("12_floodlight_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 0)
+sector_name = "EAST"
+
+[node name="FloodlightSouth" parent="SectorFloodlights" unique_id=1881881830 instance=ExtResource("12_floodlight_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
+sector_name = "SOUTH"
+
+[node name="FloodlightWest" parent="SectorFloodlights" unique_id=1747909436 instance=ExtResource("12_floodlight_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, 0)
+sector_name = "WEST"
+
+[node name="Pickups" type="Node3D" parent="." unique_id=1649221788]
+script = ExtResource("15_spawner_script")
+
+[node name="FusePickup1" parent="Pickups" unique_id=1944202435 instance=ExtResource("11_fuse_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -15)
+
+[node name="FusePickup2" parent="Pickups" unique_id=78090221 instance=ExtResource("11_fuse_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -25)
+
+[node name="FusePickup3" parent="Pickups" unique_id=1686889197 instance=ExtResource("11_fuse_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, -50)
+
+[node name="FusePickup4" parent="Pickups" unique_id=555891612 instance=ExtResource("11_fuse_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -30)
+
+[node name="FusePickup5" parent="Pickups" unique_id=1912020156 instance=ExtResource("11_fuse_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -70)
+
+[node name="ForestTrees" type="Node3D" parent="." unique_id=2021090646]
+
+[node name="Tree1" parent="ForestTrees" unique_id=689127287 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -6)
+
+[node name="Tree2" parent="ForestTrees" unique_id=1859139524 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -8)
+
+[node name="Tree3" parent="ForestTrees" unique_id=1887100429 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, -25)
+
+[node name="Tree4" parent="ForestTrees" unique_id=1558410604 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -35)
+
+[node name="Tree5" parent="ForestTrees" unique_id=1803053382 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0, -45)
+
+[node name="Tree6" parent="ForestTrees" unique_id=1800970859 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0, -60)
+
+[node name="Tree7" parent="ForestTrees" unique_id=268588117 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, -75)
+
+[node name="Tree8" parent="ForestTrees" unique_id=2128178927 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, -20)
+
+[node name="Tree9" parent="ForestTrees" unique_id=1046405835 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -30)
+
+[node name="Tree10" parent="ForestTrees" unique_id=1775454092 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 0, -80)
+
+[node name="Tree11" parent="ForestTrees" unique_id=612319406 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -15)
+
+[node name="Tree12" parent="ForestTrees" unique_id=1782568427 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -10)
+
+[node name="Tree13" parent="ForestTrees" unique_id=1725207530 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 0, -10)
+
+[node name="Tree14" parent="ForestTrees" unique_id=986657767 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 0, -45)
+
+[node name="Tree15" parent="ForestTrees" unique_id=938808315 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -40)
+
+[node name="Tree16" parent="ForestTrees" unique_id=1760188902 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, -60)
+
+[node name="Tree17" parent="ForestTrees" unique_id=428661412 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -55)
+
+[node name="Tree18" parent="ForestTrees" unique_id=1680150074 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 0, -40)
+
+[node name="Tree19" parent="ForestTrees" unique_id=938627369 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -65)
+
+[node name="Tree20" parent="ForestTrees" unique_id=542245346 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, -75)
+
+[node name="Tree21" parent="ForestTrees" unique_id=478021354 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, -85)
+
+[node name="Tree22" parent="ForestTrees" unique_id=1001263557 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -85)
+
+[node name="Tree23" parent="ForestTrees" unique_id=217316202 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0, -95)
+
+[node name="Tree24" parent="ForestTrees" unique_id=1316770526 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -95)
+
+[node name="Tree25" parent="ForestTrees" unique_id=126525393 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -105)
+
+[node name="Tree26" parent="ForestTrees" unique_id=1559361400 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -105)
+
+[node name="Tree27" parent="ForestTrees" unique_id=1710085344 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -108)
+
+[node name="Tree28" parent="ForestTrees" unique_id=1764825506 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, -108)
+
+[node name="Tree29" parent="ForestTrees" unique_id=1438045319 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -20)
+
+[node name="Tree30" parent="ForestTrees" unique_id=460287178 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0, -5)
+
+[node name="AntennaManager" type="Node3D" parent="." unique_id=2083870457 groups=["antenna_managers"]]
+script = ExtResource("8_manager_script")
+
+[node name="AntennaPanel1" parent="AntennaManager" unique_id=1548650411 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="AntennaPanel2" parent="AntennaManager" unique_id=1297900786 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -50)
+antenna_id = 2
+
+[node name="AntennaPanel3" parent="AntennaManager" unique_id=586413378 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0, -35)
+antenna_id = 3
+
+[node name="AntennaPanel4" parent="AntennaManager" unique_id=1536110681 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -70)
+antenna_id = 4
+
+[node name="AntennaPanel5" parent="AntennaManager" unique_id=615831172 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -25)
+antenna_id = 5
+
+[node name="AntennaPanel6" parent="AntennaManager" unique_id=1175678720 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -85)
+antenna_id = 6
+
+[node name="AntennaPanel7" parent="AntennaManager" unique_id=1617308396 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, -55)
+antenna_id = 7
+
+[node name="AntennaPanel8" parent="AntennaManager" unique_id=1791294218 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -105)
+antenna_id = 8
+
+[node name="AntennaPanel9" parent="AntennaManager" unique_id=683017476 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 0, -15)
+antenna_id = 9
+
+[node name="AntennaPanel10" parent="AntennaManager" unique_id=183530916 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -15)
+antenna_id = 10
+
+[node name="AntennaPanel11" parent="AntennaManager" unique_id=1863317678 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -45)
+antenna_id = 11
+
+[node name="AntennaPanel12" parent="AntennaManager" unique_id=1425971212 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -55)
+antenna_id = 12
+
+[node name="AntennaPanel13" parent="AntennaManager" unique_id=1215611841 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, -85)
+antenna_id = 13
+
+[node name="AntennaPanel14" parent="AntennaManager" unique_id=883748653 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -100)
+antenna_id = 14
+
+[node name="AntennaPanel15" parent="AntennaManager" unique_id=678519378 instance=ExtResource("4_antenna_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 0, -108)
+antenna_id = 15
+
+[node name="Threats" type="Node3D" parent="." unique_id=1674922237]
+
+[node name="AnomalyThreat1" parent="Threats" unique_id=1497098625 instance=ExtResource("5_threat_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -40)
+
+[node name="AnomalyThreat2" parent="Threats" unique_id=49650054 instance=ExtResource("5_threat_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -30)

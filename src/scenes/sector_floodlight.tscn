@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://sector_floodlight_scene"]
+
+[ext_resource type="Script" path="res://src/scripts/sector_floodlight.gd" id="1_floodlight_script"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pole"]
+top_radius = 0.15
+bottom_radius = 0.2
+height = 8.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.2, 0.22, 0.25, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+size = Vector3(0.8, 0.4, 0.6)
+
+[node name="SectorFloodlight" type="Node3D"]
+script = ExtResource("1_floodlight_script")
+
+[node name="PoleMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+mesh = SubResource("CylinderMesh_pole")
+surface_material_override/0 = SubResource("StandardMaterial3D_metal")
+
+[node name="LightMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.8, 0.3)
+mesh = SubResource("BoxMesh_head")
+surface_material_override/0 = SubResource("StandardMaterial3D_metal")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 7.8, 0.5)
+visible = false
+light_color = Color(0.8, 0.95, 1, 1)
+light_energy = 45.0
+spot_range = 65.0
+spot_angle = 70.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, 0)
+visible = false
+light_color = Color(0.7, 0.9, 1, 1)
+light_energy = 15.0
+omni_range = 45.0
