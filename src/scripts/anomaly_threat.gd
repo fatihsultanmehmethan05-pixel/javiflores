@@ -5,7 +5,7 @@ extends Area3D
 
 @export var move_speed: float = 2.4
 @export var detection_radius: float = 9.0
-@export var damage_per_second: float = 12.0
+@export var damage_per_second: float = 65.0
 @export var patrol_radius: float = 18.0
 
 @onready var light_indicator: OmniLight3D = get_node_or_null("IndicatorLight")
@@ -55,14 +55,11 @@ func _process(delta: float) -> void:
 	# AI Decision State Machine
 	if dist_to_player <= detection_radius:
 		if is_player_hidden:
+			is_chasing = false
+			is_suspicious = false
 			suspicion_timer = 0.0
-			stationary_timer += delta
-			
-			if stationary_timer > 10.0:
-				is_suspicious = true
-				_move_towards(player_ref.global_position, delta * 0.4)
-			else:
-				_handle_patrol(delta)
+			stationary_timer = 0.0
+			_handle_patrol(delta)
 		else:
 			stationary_timer = 0.0
 			suspicion_timer += delta
@@ -76,8 +73,8 @@ func _process(delta: float) -> void:
 				is_chasing = true
 				_move_towards(player_ref.global_position, delta)
 		
-		# Deal damage on contact during chase
-		if dist_to_player <= 2.0 and is_chasing:
+		# Deal damage on contact during chase ONLY when NOT hidden
+		if dist_to_player <= 2.0 and is_chasing and not is_player_hidden:
 			if player_ref.has_method("take_damage"):
 				player_ref.call("take_damage", damage_per_second * delta)
 	else:
@@ -138,6 +135,8 @@ func _check_player_hidden() -> bool:
 	var is_crouching: bool = false
 	if "current_state" in player_ref:
 		is_crouching = (player_ref.current_state == 3) # CROUCHING State
+	if not is_crouching and player_ref.has_method("is_local_player") and player_ref.is_local_player():
+		is_crouching = Input.is_action_pressed("crouch")
 		
 	var is_flashlight_on: bool = false
 	var flashlight = player_ref.get_node_or_null("Head/Camera3D/Flashlight")

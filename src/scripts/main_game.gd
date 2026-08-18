@@ -105,21 +105,55 @@ func _on_network_error(message: String) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if current_game_state == GameState.GAME_OVER or current_game_state == GameState.VICTORY:
-		if event is InputEventKey and event.pressed and event.physical_keycode == KEY_R:
+		if event is InputEventKey and event.pressed:
 			get_tree().reload_current_scene()
 
 func _process(_delta: float) -> void:
 	_update_multiplayer_debug_overlay()
 	var player = get_local_player()
+	
+	# Death Detection Check
+	if player and ("_is_dead" in player and player._is_dead or "current_health" in player and player.current_health <= 0.0):
+		if current_game_state != GameState.GAME_OVER:
+			_on_player_died()
+			return
+
+	var is_in_lobby: bool = false
+	if lobby_ui:
+		var panel = lobby_ui.get_node_or_null("PanelContainer")
+		if panel and panel.visible:
+			is_in_lobby = true
+		elif lobby_ui.visible:
+			is_in_lobby = true
+
+	if is_in_lobby:
+		if hud and hud.has_method("set_hud_visible"):
+			hud.call("set_hud_visible", false)
+		return
+	else:
+		if hud and hud.has_method("set_hud_visible"):
+			hud.call("set_hud_visible", true)
+
 	if (current_game_state == GameState.PLAYING or current_game_state == GameState.EXTRACTION_PHASE) and player and hud:
 		var is_crouching: bool = false
 		if "current_state" in player:
 			is_crouching = (player.current_state == 3) # CROUCHING
 		
+		# Update Health, Battery, and Stamina UI continuously
+		if "current_health" in player and "max_health" in player and hud.has_method("update_health"):
+			hud.call("update_health", player.current_health, player.max_health)
+			
+		if "current_stamina" in player and "max_stamina" in player and hud.has_method("update_stamina"):
+			var is_exh: bool = player.get("_is_exhausted") if "_is_exhausted" in player else false
+			hud.call("update_stamina", player.current_stamina, player.max_stamina, is_exh)
+			
 		var is_flashlight_on: bool = false
 		var flashlight = player.get_node_or_null("Head/Camera3D/Flashlight")
-		if flashlight and "is_on" in flashlight:
-			is_flashlight_on = flashlight.is_on
+		if flashlight:
+			if "current_battery" in flashlight and "max_battery" in flashlight and hud.has_method("update_battery"):
+				hud.call("update_battery", flashlight.current_battery, flashlight.max_battery)
+			if "is_on" in flashlight:
+				is_flashlight_on = flashlight.is_on
 		
 		var is_hidden: bool = is_crouching and not is_flashlight_on
 		if hud.has_method("update_stealth_status"):
@@ -184,6 +218,9 @@ func _process_radio_proximity() -> void:
 
 	if hud.has_method("update_radio_status"):
 		hud.call("update_radio_status", min_antenna_dist, min_threat_dist)
+
+	if player.has_method("update_detector_light"):
+		player.call("update_detector_light", min_antenna_dist, min_threat_dist, get_process_delta_time())
 
 func _on_player_focused_interactable_changed(interactable: Node3D) -> void:
 	if current_game_state == GameState.GAME_OVER or current_game_state == GameState.VICTORY:

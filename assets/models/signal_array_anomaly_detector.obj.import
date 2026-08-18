@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d0lhnn133dgcu"
+path="res://.godot/imported/signal_array_anomaly_detector.obj-ae4df39ff4c970f48a4f36b8e45a7c0d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/signal_array_anomaly_detector.obj-ae4df39ff4c970f48a4f36b8e45a7c0d.mesh"]
+
+source_file="res://assets/models/signal_array_anomaly_detector.obj"
+dest_files=["res://.godot/imported/signal_array_anomaly_detector.obj-ae4df39ff4c970f48a4f36b8e45a7c0d.mesh", "res://.godot/imported/signal_array_anomaly_detector.obj-ae4df39ff4c970f48a4f36b8e45a7c0d.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

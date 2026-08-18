@@ -58,7 +58,7 @@ environment = SubResource("Environment_night")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=558337293]
 transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
 light_color = Color(0.2, 0.3, 0.45, 1)
-light_energy = 0.04
+light_energy = 2.032
 shadow_enabled = true
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=347836360]
@@ -87,7 +87,7 @@ spawn_path = NodePath("../PlayersContainer")
 [node name="FireLookoutTower" parent="." unique_id=1539625116 instance=ExtResource("16_tower_scene")]
 
 [node name="TowerWalkwayRamp" parent="." unique_id=507366271 instance=ExtResource("17_ramp_scene")]
-transform = Transform3D(1, 0, 0, 0, 1.0200385, -0.7865291, 0, 0.7274796, 1.102835, 0.23171854, 3.4010744, 12.248167)
+transform = Transform3D(1, 0, 0, 0, 1.0200385, -0.7865291, 0, 0.7274796, 1.102835, 0.075938225, 3.4010744, 12.248167)
 
 [node name="TowerBeaconLight" type="OmniLight3D" parent="." unique_id=361221883]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)

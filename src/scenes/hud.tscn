@@ -66,20 +66,6 @@ size_flags_vertical = 8
 mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="RadioLabel" type="Label" parent="MarginContainer/VBoxContainerLeft"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "RADIO: LOW FREQUENCY HUM"
-
-[node name="StealthLabel" type="Label" parent="MarginContainer/VBoxContainerLeft"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(1, 0.7, 0, 1)
-theme_override_font_sizes/font_size = 14
-text = "STEALTH: EXPOSED"
-
 [node name="HealthBarLabel" type="Label" parent="MarginContainer/VBoxContainerLeft"]
 layout_mode = 2
 mouse_filter = 2
@@ -102,6 +88,21 @@ theme_override_font_sizes/font_size = 12
 text = "FLASHLIGHT BATTERY"
 
 [node name="BatteryBar" type="ProgressBar" parent="MarginContainer/VBoxContainerLeft"]
+custom_minimum_size = Vector2(200, 15)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 2
+value = 100.0
+show_percentage = false
+
+[node name="StaminaLabel" type="Label" parent="MarginContainer/VBoxContainerLeft"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 12
+text = "STAMINA"
+
+[node name="StaminaBar" type="ProgressBar" parent="MarginContainer/VBoxContainerLeft"]
 custom_minimum_size = Vector2(200, 15)
 layout_mode = 2
 size_flags_horizontal = 0

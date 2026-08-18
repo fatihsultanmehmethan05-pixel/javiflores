@@ -7,14 +7,20 @@ extends CanvasLayer
 @onready var battery_bar: ProgressBar = $MarginContainer/VBoxContainerLeft/BatteryBar
 @onready var health_bar: ProgressBar = $MarginContainer/VBoxContainerLeft/HealthBar
 @onready var status_label: Label = $MarginContainer/StatusLabel
-@onready var stealth_label: Label = $MarginContainer/VBoxContainerLeft/StealthLabel
-@onready var radio_label: Label = $MarginContainer/VBoxContainerLeft/RadioLabel
+@onready var stealth_label: Label = get_node_or_null("MarginContainer/VBoxContainerLeft/StealthLabel")
+@onready var radio_label: Label = get_node_or_null("MarginContainer/VBoxContainerLeft/RadioLabel")
 @onready var debug_label: Label = get_node_or_null("MarginContainer/DebugLabel")
 @onready var crosshair: Control = $Crosshair
+
+@onready var health_bar_label: Label = get_node_or_null("MarginContainer/VBoxContainerLeft/HealthBarLabel")
+@onready var battery_bar_label: Label = get_node_or_null("MarginContainer/VBoxContainerLeft/BatteryLabel")
+@onready var stamina_bar: ProgressBar = get_node_or_null("MarginContainer/VBoxContainerLeft/StaminaBar")
+@onready var stamina_label: Label = get_node_or_null("MarginContainer/VBoxContainerLeft/StaminaLabel")
 
 func update_multiplayer_debug(debug_text: String) -> void:
 	if debug_label:
 		debug_label.text = debug_text
+
 @onready var overlay_panel: PanelContainer = $OverlayPanel
 @onready var overlay_title: Label = $OverlayPanel/VBoxContainer/TitleLabel
 @onready var overlay_sub: Label = $OverlayPanel/VBoxContainer/SubLabel
@@ -22,6 +28,50 @@ func update_multiplayer_debug(debug_text: String) -> void:
 func _ready() -> void:
 	if overlay_panel:
 		overlay_panel.visible = false
+	update_battery(100.0, 100.0)
+	update_health(100.0, 100.0)
+	update_stamina(100.0, 100.0, false)
+	set_hud_visible(false)
+
+func set_hud_visible(is_visible: bool) -> void:
+	var margin = get_node_or_null("MarginContainer")
+	if margin:
+		margin.visible = is_visible
+	if crosshair:
+		crosshair.visible = is_visible
+
+func update_stealth_status(_is_hidden: bool) -> void:
+	pass
+
+func update_radio_status(_closest_antenna_dist: float, _closest_threat_dist: float) -> void:
+	pass
+
+func update_stamina(current: float, max_val: float, is_exhausted: bool = false) -> void:
+	if stamina_bar:
+		stamina_bar.max_value = max_val
+		stamina_bar.value = current
+		var ratio: float = clamp(current / maxf(max_val, 1.0), 0.0, 1.0)
+		var color := Color("#00E5FF")
+		if is_exhausted:
+			color = Color("#FF3333")
+		else:
+			var cyan := Color("#00E5FF")
+			var yellow := Color("#FFD700")
+			var orange := Color("#FF8C00")
+			if ratio > 0.5:
+				color = yellow.lerp(cyan, (ratio - 0.5) * 2.0)
+			else:
+				color = orange.lerp(yellow, ratio * 2.0)
+
+		_apply_bar_color(stamina_bar, color)
+
+		if stamina_label:
+			if is_exhausted:
+				stamina_label.text = "STAMINA [EXHAUSTED]"
+				stamina_label.add_theme_color_override("font_color", Color("#FF3333"))
+			else:
+				stamina_label.text = "STAMINA"
+				stamina_label.add_theme_color_override("font_color", color)
 
 func set_prompt(text: String) -> void:
 	if prompt_label:
@@ -32,35 +82,42 @@ func update_battery(current: float, max_val: float) -> void:
 	if battery_bar:
 		battery_bar.max_value = max_val
 		battery_bar.value = current
+		var ratio: float = clamp(current / maxf(max_val, 1.0), 0.0, 1.0)
+		var color := _get_status_color(ratio)
+		_apply_bar_color(battery_bar, color)
+		if battery_bar_label:
+			battery_bar_label.add_theme_color_override("font_color", color)
 
 func update_health(current: float, max_val: float) -> void:
 	if health_bar:
 		health_bar.max_value = max_val
 		health_bar.value = current
+		var ratio: float = clamp(current / maxf(max_val, 1.0), 0.0, 1.0)
+		var color := _get_status_color(ratio)
+		_apply_bar_color(health_bar, color)
+		if health_bar_label:
+			health_bar_label.add_theme_color_override("font_color", color)
 
-func update_stealth_status(is_hidden: bool) -> void:
-	if stealth_label:
-		if is_hidden:
-			stealth_label.text = "STEALTH: HIDDEN [SAFE]"
-			stealth_label.add_theme_color_override("font_color", Color("#00FF66")) # Green
-		else:
-			stealth_label.text = "STEALTH: EXPOSED [ANOMALY RISKS]"
-			stealth_label.add_theme_color_override("font_color", Color("#FFB000")) # Amber
-
-func update_radio_status(closest_antenna_dist: float, closest_threat_dist: float) -> void:
-	if not radio_label:
-		return
-
-	if closest_threat_dist < 12.0:
-		radio_label.text = "RADIO: !!! HEAVY STATIC NOISE (THREAT NEARBY) !!!"
-		radio_label.add_theme_color_override("font_color", Color("#D92B2B")) # Red Warning
-	elif closest_antenna_dist < 15.0:
-		var signal_pct: int = clamp(int((1.0 - (closest_antenna_dist / 15.0)) * 100.0), 10, 100)
-		radio_label.text = "RADIO SIGNAL: BEEPING [" + str(signal_pct) + "% FREQUENCY LOCK]"
-		radio_label.add_theme_color_override("font_color", Color("#00FF66")) # Green Signal
+func _get_status_color(ratio: float) -> Color:
+	var green := Color("#00FF66")
+	var yellow := Color("#FFB000")
+	var red := Color("#FF1A1A")
+	
+	if ratio > 0.5:
+		var t := (ratio - 0.5) * 2.0
+		return yellow.lerp(green, t)
 	else:
-		radio_label.text = "RADIO: LOW FREQUENCY HUM"
-		radio_label.add_theme_color_override("font_color", Color("#AAAAAA")) # Dim Gray
+		var t := ratio * 2.0
+		return red.lerp(yellow, t)
+
+func _apply_bar_color(bar: ProgressBar, color: Color) -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = color
+	sb.corner_radius_top_left = 2
+	sb.corner_radius_top_right = 2
+	sb.corner_radius_bottom_right = 2
+	sb.corner_radius_bottom_left = 2
+	bar.add_theme_stylebox_override("fill", sb)
 
 func update_antenna_status(fixed_count: int, total_count: int) -> void:
 	if status_label:

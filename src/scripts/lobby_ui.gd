@@ -54,9 +54,11 @@ func _on_join_pressed() -> void:
 func hide_lobby() -> void:
 	if panel:
 		panel.visible = false
+	visible = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func show_lobby(message: String = "") -> void:
+	visible = true
 	if panel:
 		panel.visible = true
 	if status_label and not message.is_empty():

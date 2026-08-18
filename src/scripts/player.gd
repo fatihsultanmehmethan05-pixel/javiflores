@@ -105,8 +105,121 @@ func _ready() -> void:
 	if camera and is_local:
 		camera.make_current()
 
+	# Hide body capsule and eyes in First Person view for local player
+	if mesh_instance and is_local:
+		mesh_instance.visible = false
+
 	if interact_raycast:
 		interact_raycast.target_position = Vector3(0, 0, -interact_distance)
+
+	_load_viewmodels()
+
+@export_group("Left Hand - Anomaly Detector")
+@export var detector_position: Vector3 = Vector3(-0.30, -0.20, -0.45)
+@export var detector_rotation: Vector3 = Vector3(-45, 180, 0)
+@export var detector_scale: Vector3 = Vector3(0.85, 0.85, 0.85)
+
+@export_group("Right Hand - Flashlight")
+@export var flashlight_position: Vector3 = Vector3(0.35, -0.16, -0.52)
+@export var flashlight_model_rotation: Vector3 = Vector3(0, -90, 0)
+@export var flashlight_model_scale: Vector3 = Vector3(0.85, 0.85, 0.85)
+
+func _load_viewmodels() -> void:
+	if not is_local_player():
+		return
+
+	var left_hand = get_node_or_null("Head/Camera3D/LeftHand")
+	if left_hand:
+		left_hand.position = detector_position
+
+	var detector_mesh = load_obj_as_mesh("res://assets/models/signal_array_anomaly_detector.obj")
+	if detector_mesh:
+		var detector_node = get_node_or_null("Head/Camera3D/LeftHand/AnomalyDetector")
+		if detector_node and detector_node is MeshInstance3D:
+			detector_node.mesh = detector_mesh
+			detector_node.rotation_degrees = detector_rotation
+			detector_node.scale = detector_scale
+
+	var right_hand = get_node_or_null("Head/Camera3D/RightHand")
+	if right_hand:
+		right_hand.position = flashlight_position
+
+	var light_mesh = load_obj_as_mesh("res://assets/models/sa_light.obj")
+	if light_mesh:
+		var light_node = get_node_or_null("Head/Camera3D/RightHand/SALightMesh")
+		if light_node and light_node is MeshInstance3D:
+			light_node.mesh = light_mesh
+			light_node.rotation_degrees = flashlight_model_rotation
+			light_node.scale = flashlight_model_scale
+
+@onready var detector_light: OmniLight3D = get_node_or_null("Head/Camera3D/LeftHand/DetectorLight")
+var _detector_pulse_time: float = 0.0
+
+func update_detector_light(closest_antenna_dist: float, closest_threat_dist: float, delta: float) -> void:
+	if not detector_light:
+		detector_light = get_node_or_null("Head/Camera3D/LeftHand/DetectorLight")
+		if not detector_light:
+			return
+
+	_detector_pulse_time += delta
+
+	# Priority 1: Monster Threat Nearby -> RED Warning
+	if closest_threat_dist < 12.0:
+		detector_light.light_color = Color("#FF1A1A")
+		var pulse: float = (sin(_detector_pulse_time * 16.0) + 1.0) * 0.5
+		detector_light.light_energy = lerpf(1.2, 5.0, pulse)
+
+	# Priority 2: Damaged Antenna Nearby -> GREEN Proximity (shines brighter/fuller as player gets closer)
+	elif closest_antenna_dist < 20.0:
+		var ratio: float = clamp(1.0 - (closest_antenna_dist / 20.0), 0.0, 1.0)
+		var pale_green := Color(0.02, 0.3, 0.1)
+		var full_green := Color("#00FF66")
+		detector_light.light_color = pale_green.lerp(full_green, ratio)
+		detector_light.light_energy = lerpf(0.6, 4.2, ratio)
+
+	# Priority 3: Normal / Default State -> BLUE Hum
+	else:
+		detector_light.light_color = Color("#00A2FF")
+		detector_light.light_energy = 1.8
+
+static func load_obj_as_mesh(obj_path: String) -> ArrayMesh:
+	if not FileAccess.file_exists(obj_path):
+		return null
+	var file := FileAccess.open(obj_path, FileAccess.READ)
+	if not file:
+		return null
+	
+	var vertices: Array[Vector3] = []
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	
+	while not file.eof_reached():
+		var line := file.get_line().strip_edges()
+		if line.begins_with("v "):
+			var parts := line.split(" ", false)
+			if parts.size() >= 4:
+				vertices.append(Vector3(parts[1].to_float(), parts[2].to_float(), parts[3].to_float()))
+		elif line.begins_with("f "):
+			var parts := line.split(" ", false)
+			if parts.size() >= 4:
+				var face_indices: Array[int] = []
+				for i in range(1, 4):
+					var idx_str := parts[i].split("/")[0]
+					var idx := idx_str.to_int() - 1
+					if idx >= 0 and idx < vertices.size():
+						face_indices.append(idx)
+				if face_indices.size() == 3:
+					# Front face
+					st.add_vertex(vertices[face_indices[0]])
+					st.add_vertex(vertices[face_indices[1]])
+					st.add_vertex(vertices[face_indices[2]])
+					# Back face for solid double-sided rendering
+					st.add_vertex(vertices[face_indices[2]])
+					st.add_vertex(vertices[face_indices[1]])
+					st.add_vertex(vertices[face_indices[0]])
+	
+	st.generate_normals()
+	return st.commit()
 
 func _setup_fallback_inputs() -> void:
 	var actions = {
@@ -228,11 +341,13 @@ func _handle_crouch(delta: float) -> void:
 	var wants_crouch: bool = Input.is_action_pressed("crouch")
 	var is_ceiling_blocked: bool = ceiling_raycast.is_colliding() if ceiling_raycast else false
 
-	if wants_crouch or is_ceiling_blocked:
+	var is_crouching: bool = wants_crouch or is_ceiling_blocked
+	if is_crouching:
 		current_state = State.CROUCHING
 		_update_height(_crouch_height, _crouch_cam_y, delta)
-	elif current_state == State.CROUCHING:
-		current_state = State.IDLE
+	else:
+		if current_state == State.CROUCHING:
+			current_state = State.IDLE
 		_update_height(_standing_height, _standing_cam_y, delta)
 
 func _update_height(target_height: float, target_cam_y: float, delta: float) -> void:
@@ -242,20 +357,45 @@ func _update_height(target_height: float, target_cam_y: float, delta: float) -> 
 	if head:
 		head.position.y = lerp(head.position.y, target_cam_y, 10.0 * delta)
 
+# Stamina System Variables
+@export var max_stamina: float = 100.0
+@export var stamina_drain_rate: float = 25.0
+@export var stamina_regen_rate: float = 15.0
+@export var stamina_regen_delay: float = 1.0
+
+var current_stamina: float = 100.0
+var _stamina_delay_timer: float = 0.0
+var _is_exhausted: bool = false
+
 func _handle_movement(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction: Vector3 = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
+	var wants_sprint: bool = Input.is_action_pressed("sprint") and input_dir.y < 0 and current_state != State.CROUCHING and not _is_exhausted and current_stamina > 0.0
+
 	var speed: float = walk_speed
 	if current_state == State.CROUCHING:
 		speed = crouch_speed
-	elif Input.is_action_pressed("sprint") and input_dir.y < 0 and current_state != State.CROUCHING:
-		speed = sprint_speed
-		current_state = State.SPRINTING
-	elif input_dir.length() > 0:
-		current_state = State.WALKING
 	else:
-		current_state = State.IDLE
+		if wants_sprint:
+			speed = sprint_speed
+			current_state = State.SPRINTING
+			current_stamina = maxf(current_stamina - stamina_drain_rate * delta, 0.0)
+			_stamina_delay_timer = stamina_regen_delay
+			if current_stamina <= 0.0:
+				_is_exhausted = true
+		elif input_dir.length() > 0:
+			current_state = State.WALKING
+		else:
+			current_state = State.IDLE
+
+	# Stamina Recovery
+	if not wants_sprint:
+		_stamina_delay_timer = maxf(_stamina_delay_timer - delta, 0.0)
+		if _stamina_delay_timer <= 0.0:
+			current_stamina = minf(current_stamina + stamina_regen_rate * delta, max_stamina)
+			if _is_exhausted and current_stamina >= 25.0:
+				_is_exhausted = false
 
 	var current_accel: float = accel if is_on_floor() else air_accel
 	if direction != Vector3.ZERO:
