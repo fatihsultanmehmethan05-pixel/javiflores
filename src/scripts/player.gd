@@ -269,10 +269,6 @@ func _apply_fuse_state(state: bool) -> void:
 		return
 	has_fuse = state
 
-func add_battery(amount: float = 50.0) -> void:
-	if flashlight and flashlight.has_method("add_battery"):
-		flashlight.call("add_battery", amount)
-
 func _unhandled_input(event: InputEvent) -> void:
 	if not can_process_local_input() or _is_dead:
 		return
