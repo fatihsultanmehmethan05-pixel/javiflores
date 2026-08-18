@@ -4,7 +4,7 @@ extends SpotLight3D
 ## Owner-controlled flashlight; only its player authority may publish state.
 
 @export var max_battery: float = 100.0
-@export var drain_rate: float = 0.8
+@export var drain_rate: float = 3.8
 @export var low_battery_threshold: float = 20.0
 
 var current_battery: float = 100.0
@@ -18,6 +18,12 @@ signal battery_changed(current: float, max_value: float)
 func _ready() -> void:
 	current_battery = max_battery
 	visible = is_on
+
+func add_battery(amount: float) -> void:
+	current_battery = minf(current_battery + amount, max_battery)
+	battery_changed.emit(current_battery, max_battery)
+	if current_battery > 0.0 and not is_on:
+		apply_flashlight_state.rpc(true)
 
 func toggle() -> void:
 	if not is_multiplayer_authority() or current_battery <= 0.0:

@@ -13,6 +13,7 @@ var current_game_state: GameState = GameState.PLAYING
 @onready var tower_spotlight: SpotLight3D = get_node_or_null("TowerSpotlight")
 @onready var antenna_manager: Node3D = get_node_or_null("AntennaManager")
 @onready var fuse_spawner: Node3D = get_node_or_null("Pickups")
+@onready var battery_spawner: Node3D = get_node_or_null("BatteryPickups")
 @onready var signal_decoder: CanvasLayer = get_node_or_null("SignalDecoder")
 @onready var lobby_ui: CanvasLayer = get_node_or_null("LobbyUI")
 
@@ -87,6 +88,8 @@ func _on_network_server_started() -> void:
 		antenna_manager.start_server_shift()
 	if fuse_spawner and fuse_spawner.has_method("start_server_shift"):
 		fuse_spawner.start_server_shift()
+	if battery_spawner and battery_spawner.has_method("start_server_shift"):
+		battery_spawner.start_server_shift()
 
 func _on_network_client_connected() -> void:
 	if lobby_ui:
@@ -98,6 +101,8 @@ func _on_network_player_joined(peer_id: int) -> void:
 			antenna_manager.call_deferred("send_snapshot_to", peer_id)
 		if fuse_spawner and fuse_spawner.has_method("send_snapshot_to"):
 			fuse_spawner.call_deferred("send_snapshot_to", peer_id)
+		if battery_spawner and battery_spawner.has_method("send_snapshot_to"):
+			battery_spawner.call_deferred("send_snapshot_to", peer_id)
 
 func _on_network_error(message: String) -> void:
 	if lobby_ui:

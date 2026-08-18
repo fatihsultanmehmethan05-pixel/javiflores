@@ -16,6 +16,8 @@
 [ext_resource type="Script" uid="uid://bdru6v141c42t" path="res://src/scripts/fuse_spawner.gd" id="15_spawner_script"]
 [ext_resource type="PackedScene" path="res://src/scenes/fire_lookout_tower.tscn" id="16_tower_scene"]
 [ext_resource type="PackedScene" path="res://src/scenes/tower_ramp.tscn" id="17_ramp_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/battery_pickup.tscn" id="18_battery_scene"]
+[ext_resource type="Script" uid="uid://fmxpouoh8tsm" path="res://src/scripts/battery_spawner.gd" id="19_battery_spawner_script"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.01, 0.01, 0.03, 1)
@@ -58,7 +60,7 @@ environment = SubResource("Environment_night")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=558337293]
 transform = Transform3D(0.866, -0.433, 0.25, 0, 0.5, 0.866, -0.5, -0.75, 0.433, 0, 20, 0)
 light_color = Color(0.2, 0.3, 0.45, 1)
-light_energy = 2.032
+light_energy = 0.317
 shadow_enabled = true
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=347836360]
@@ -193,6 +195,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 0, -45)
 [node name="Tree15" parent="ForestTrees" unique_id=938808315 instance=ExtResource("7_tree_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -40)
 
+[node name="Tree15" parent="ForestTrees/Tree15" unique_id=1629585460 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.33657455, 0, -40)
+
+[node name="Tree15" parent="ForestTrees/Tree15/Tree15" unique_id=86174010 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.330738, 0, 16.098)
+
+[node name="Tree15" parent="ForestTrees/Tree15/Tree15/Tree15" unique_id=2065177730 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.43972, 0, 29.407082)
+
+[node name="Tree15" parent="ForestTrees/Tree15/Tree15/Tree15/Tree15" unique_id=867170638 instance=ExtResource("7_tree_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1093903, 0, 11.305492)
+
 [node name="Tree16" parent="ForestTrees" unique_id=1760188902 instance=ExtResource("7_tree_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, -60)
 
@@ -303,7 +317,40 @@ antenna_id = 15
 [node name="Threats" type="Node3D" parent="." unique_id=1674922237]
 
 [node name="AnomalyThreat1" parent="Threats" unique_id=1497098625 instance=ExtResource("5_threat_scene")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9669857, 0, -65.10862)
+move_speed = 4.065
+detection_radius = 10.465
+patrol_radius = 15.18
 
 [node name="AnomalyThreat2" parent="Threats" unique_id=49650054 instance=ExtResource("5_threat_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -30)
+move_speed = 4.09
+detection_radius = 10.605
+patrol_radius = 15.225
+
+[node name="BatteryPickups" type="Node3D" parent="." unique_id=526770517]
+script = ExtResource("19_battery_spawner_script")
+
+[node name="BatteryPickup1" parent="BatteryPickups" unique_id=249003953 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 10.2, 0.5)
+
+[node name="BatteryPickup2" parent="BatteryPickups" unique_id=1440810546 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.1, 4.5)
+
+[node name="BatteryPickup3" parent="BatteryPickups" unique_id=548956382 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.1, 3.5)
+
+[node name="BatteryPickup4" parent="BatteryPickups" unique_id=1302863364 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.1, -30)
+
+[node name="BatteryPickup5" parent="BatteryPickups" unique_id=140545849 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.1, -60)
+
+[node name="BatteryPickup6" parent="BatteryPickups" unique_id=1318597221 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0.1, -90)
+
+[node name="BatteryPickup7" parent="BatteryPickups" unique_id=1825257092 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.1, -105)
+
+[node name="BatteryPickup8" parent="BatteryPickups" unique_id=1492385127 instance=ExtResource("18_battery_scene")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0.1, -45)
